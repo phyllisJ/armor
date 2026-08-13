@@ -106,61 +106,94 @@ function PedestalRing({
   )
 }
 
+function RadialTicks({ count, radius, length, y }: { count: number; radius: number; length: number; y: number }) {
+  return (
+    <group position={[0, y, 0]}>
+      {Array.from({ length: count }, (_, index) => {
+        const angle = (index / count) * Math.PI * 2
+        return (
+          <mesh
+            key={index}
+            position={[Math.sin(angle) * radius, 0, Math.cos(angle) * radius]}
+            rotation={[0, angle, 0]}
+          >
+            <boxGeometry args={[0.025, 0.018, index % 4 === 0 ? length * 1.65 : length]} />
+            <meshBasicMaterial
+              color={index % 4 === 0 ? '#d9f7ff' : '#3aa8ff'}
+              transparent
+              opacity={index % 4 === 0 ? 0.95 : 0.58}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        )
+      })}
+    </group>
+  )
+}
+
 function Pedestal() {
-  const spin = useRef<THREE.Group>(null)
+  const clockwise = useRef<THREE.Group>(null)
+  const counterClockwise = useRef<THREE.Group>(null)
   const glow = useRef<THREE.Mesh>(null)
 
   useFrame((state, delta) => {
-    if (spin.current) spin.current.rotation.y += delta * 0.35
+    if (clockwise.current) clockwise.current.rotation.y += delta * 0.34
+    if (counterClockwise.current) counterClockwise.current.rotation.y -= delta * 0.2
     if (glow.current) {
-      const s = 1 + Math.sin(state.clock.elapsedTime * 1.6) * 0.06
-      glow.current.scale.set(s, 1, s)
-      const mat = glow.current.material as THREE.MeshBasicMaterial
-      mat.opacity = 0.22 + Math.sin(state.clock.elapsedTime * 2) * 0.06
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.8) * 0.045
+      glow.current.scale.set(pulse, 1, pulse)
+      ;(glow.current.material as THREE.MeshBasicMaterial).opacity = 0.28 + Math.sin(state.clock.elapsedTime * 2) * 0.07
     }
   })
 
   return (
-    <group position={[0, -1.55, 0]}>
-      {/* 厚实体台面 */}
-      <mesh position={[0, 0.08, 0]} rotation={[-0.08, 0, 0]}>
-        <cylinderGeometry args={[1.55, 1.72, 0.22, 64]} />
-        <meshStandardMaterial color="#071428" metalness={0.75} roughness={0.35} emissive="#0a2a55" emissiveIntensity={0.45} />
+    <group position={[0, -1.5, 0]}>
+      <mesh position={[0, -0.34, 0]}>
+        <cylinderGeometry args={[2.28, 2.48, 0.2, 96]} />
+        <meshStandardMaterial color="#020b1b" metalness={0.92} roughness={0.24} emissive="#061d42" emissiveIntensity={0.75} />
       </mesh>
-      <mesh position={[0, -0.12, 0]} rotation={[-0.08, 0, 0]}>
-        <cylinderGeometry args={[1.72, 1.95, 0.28, 64]} />
-        <meshStandardMaterial color="#050f1e" metalness={0.7} roughness={0.4} emissive="#071a33" emissiveIntensity={0.3} />
+      <mesh position={[0, -0.19, 0]}>
+        <cylinderGeometry args={[2.05, 2.28, 0.14, 96]} />
+        <meshStandardMaterial color="#06162d" metalness={0.9} roughness={0.2} emissive="#07366d" emissiveIntensity={0.62} />
       </mesh>
-      <mesh position={[0, -0.38, 0]} rotation={[-0.08, 0, 0]}>
-        <cylinderGeometry args={[1.95, 2.15, 0.32, 64]} />
-        <meshStandardMaterial color="#040c18" metalness={0.65} roughness={0.45} emissive="#061428" emissiveIntensity={0.25} />
+      <mesh position={[0, -0.07, 0]}>
+        <cylinderGeometry args={[1.72, 2.04, 0.12, 96]} />
+        <meshStandardMaterial color="#071a34" metalness={0.86} roughness={0.2} emissive="#0a3d7a" emissiveIntensity={0.7} />
       </mesh>
-
-      {/* 中心发光盘 */}
-      <mesh ref={glow} position={[0, 0.22, 0]} rotation={[-Math.PI / 2 - 0.08, 0, 0]}>
-        <circleGeometry args={[0.72, 48]} />
-        <meshBasicMaterial color="#3db8ff" transparent opacity={0.28} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <mesh position={[0, 0.08, 0]}>
+        <cylinderGeometry args={[1.18, 1.55, 0.18, 96]} />
+        <meshStandardMaterial color="#082447" metalness={0.8} roughness={0.18} emissive="#096fc4" emissiveIntensity={0.9} />
       </mesh>
-      <mesh position={[0, 0.24, 0]} rotation={[-Math.PI / 2 - 0.08, 0, 0]}>
-        <ringGeometry args={[0.55, 0.78, 64]} />
-        <meshBasicMaterial color="#7adfff" transparent opacity={0.55} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[0, 0.2, 0]}>
+        <cylinderGeometry args={[0.76, 1.02, 0.12, 96]} />
+        <meshStandardMaterial color="#0a315c" metalness={0.72} roughness={0.14} emissive="#139ee8" emissiveIntensity={1.25} />
       </mesh>
 
-      <group ref={spin}>
-        <PedestalRing radius={1.05} tube={0.018} y={0.28} speed={0.55} color="#5ad4ff" opacity={0.85} />
-        <PedestalRing radius={1.28} tube={0.014} y={0.18} speed={-0.32} color="#2a8fff" opacity={0.7} />
-        <PedestalRing radius={1.52} tube={0.012} y={0.05} speed={0.22} color="#4ec8ff" opacity={0.55} />
-        <PedestalRing radius={1.78} tube={0.01} y={-0.12} speed={-0.18} color="#1e6fd0" opacity={0.45} />
-        <PedestalRing radius={2.02} tube={0.009} y={-0.32} speed={0.14} color="#3aa0ff" opacity={0.35} />
+      <mesh ref={glow} position={[0, 0.27, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.68, 64]} />
+        <meshBasicMaterial color="#38b9ff" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+
+      <group ref={clockwise}>
+        <RadialTicks count={48} radius={1.48} length={0.18} y={0.05} />
+        <RadialTicks count={24} radius={2.05} length={0.22} y={-0.13} />
+        <PedestalRing radius={0.82} tube={0.028} y={0.29} speed={0} color="#b8efff" opacity={0.95} />
+        <PedestalRing radius={1.12} tube={0.018} y={0.2} speed={0} color="#35baff" opacity={0.92} />
+        <PedestalRing radius={1.58} tube={0.014} y={0.07} speed={0} color="#258fff" opacity={0.75} />
+      </group>
+      <group ref={counterClockwise}>
+        <RadialTicks count={32} radius={1.78} length={0.14} y={-0.05} />
+        <PedestalRing radius={1.82} tube={0.012} y={-0.08} speed={0} color="#48c7ff" opacity={0.62} />
+        <PedestalRing radius={2.27} tube={0.009} y={-0.27} speed={0} color="#1675f5" opacity={0.8} />
+        <PedestalRing radius={2.42} tube={0.006} y={-0.39} speed={0} color="#1669df" opacity={0.42} />
       </group>
 
-      {/* 向上光柱 */}
-      <mesh position={[0, 1.1, 0]}>
-        <cylinderGeometry args={[0.08, 0.55, 2.2, 24, 1, true]} />
-        <meshBasicMaterial color="#4ec8ff" transparent opacity={0.12} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[0, 1.02, 0]}>
+        <cylinderGeometry args={[0.1, 0.65, 2.05, 48, 1, true]} />
+        <meshBasicMaterial color="#42c5ff" transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <pointLight position={[0, 0.6, 0]} intensity={2.4} distance={6} color="#4ec8ff" />
-      <pointLight position={[0, 1.8, 0.4]} intensity={1.2} distance={5} color="#8adfff" />
+      <pointLight position={[0, 0.45, 0]} intensity={3.2} distance={6} color="#35baff" />
+      <pointLight position={[0, 1.7, 0.6]} intensity={1.5} distance={5} color="#b8efff" />
     </group>
   )
 }
