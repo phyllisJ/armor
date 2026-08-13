@@ -165,10 +165,12 @@ function Pedestal() {
         <meshStandardMaterial color="#092142" metalness={0.88} roughness={0.18} emissive="#0d568f" emissiveIntensity={0.7} />
       </mesh>
 
+      <GlassPanel radius={0.98} y={0.24} opacity={0.28} />
       <mesh ref={glow} position={[0, 0.27, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.68, 64]} />
         <meshBasicMaterial color="#2389c7" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
+      <HexHalo />
 
       <group ref={clockwise}>
         <RadialTicks count={48} radius={1.48} length={0.18} y={0.05} />
@@ -176,12 +178,14 @@ function Pedestal() {
         <PedestalRing radius={0.82} tube={0.022} y={0.29} speed={0} color="#8fcfff" opacity={0.78} />
         <PedestalRing radius={1.12} tube={0.014} y={0.2} speed={0} color="#2d8fc7" opacity={0.68} />
         <PedestalRing radius={1.58} tube={0.011} y={0.07} speed={0} color="#1766ad" opacity={0.52} />
+        <ScanArc radius={1.35} y={0.06} arc={Math.PI * 0.62} speed={0.28} color="#bfe8ff" opacity={0.4} />
       </group>
       <group ref={counterClockwise}>
         <RadialTicks count={32} radius={1.78} length={0.14} y={-0.05} />
         <PedestalRing radius={1.82} tube={0.009} y={-0.08} speed={0} color="#2d8fc7" opacity={0.44} />
         <PedestalRing radius={2.27} tube={0.007} y={-0.27} speed={0} color="#1766ad" opacity={0.58} />
         <PedestalRing radius={2.42} tube={0.005} y={-0.39} speed={0} color="#1766ad" opacity={0.26} />
+        <ScanArc radius={2.0} y={-0.1} arc={Math.PI * 0.45} speed={0.2} color="#5aa8e0" opacity={0.32} reverse />
       </group>
 
       <mesh position={[0, 1.02, 0]}>
@@ -190,6 +194,104 @@ function Pedestal() {
       </mesh>
       <pointLight position={[0, 0.45, 0]} intensity={2.1} distance={6} color="#2d8fc7" />
       <pointLight position={[0, 1.7, 0.6]} intensity={0.85} distance={5} color="#8fcfff" />
+    </group>
+  )
+}
+
+function GlassPanel({ radius, y, opacity }: { radius: number; y: number; opacity: number }) {
+  return (
+    <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <circleGeometry args={[radius, 96]} />
+      <meshPhysicalMaterial
+        color="#0d3a66"
+        transparent
+        opacity={opacity}
+        transmission={0.55}
+        roughness={0.18}
+        thickness={0.4}
+        ior={1.15}
+        clearcoat={0.6}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  )
+}
+
+function ScanArc({
+  radius,
+  y,
+  arc,
+  speed,
+  color,
+  opacity,
+  reverse = false,
+}: {
+  radius: number
+  y: number
+  arc: number
+  speed: number
+  color: string
+  opacity: number
+  reverse?: boolean
+}) {
+  const ref = useRef<THREE.Mesh>(null)
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.z += delta * speed * (reverse ? -1 : 1)
+  })
+  return (
+    <mesh ref={ref} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[radius - 0.02, radius + 0.02, 64, 1, 0, arc]} />
+      <meshBasicMaterial
+        color={color}
+        transparent
+        opacity={opacity}
+        side={THREE.DoubleSide}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+  )
+}
+
+function HexHalo() {
+  const ref = useRef<THREE.Group>(null)
+  const positions = useMemo(() => {
+    const total = 72
+    const arr = new Float32Array(total * 3)
+    for (let i = 0; i < total; i += 1) {
+      const a = (i / total) * Math.PI * 2
+      const r = 1.35 + Math.sin(i * 1.7) * 0.06
+      arr[i * 3] = Math.cos(a) * r
+      arr[i * 3 + 1] = 0
+      arr[i * 3 + 2] = Math.sin(a) * r
+    }
+    return arr
+  }, [])
+
+  useFrame((state) => {
+    if (!ref.current) return
+    ref.current.rotation.y = state.clock.elapsedTime * -0.12
+    const mat = (ref.current.children[0] as THREE.Points)?.material as THREE.PointsMaterial
+    if (mat) mat.opacity = 0.3 + Math.sin(state.clock.elapsedTime * 1.2) * 0.14
+  })
+
+  return (
+    <group ref={ref} position={[0, 0.62, 0]}>
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#a9dcff"
+          size={0.032}
+          transparent
+          opacity={0.36}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          sizeAttenuation
+        />
+      </points>
     </group>
   )
 }
@@ -269,7 +371,7 @@ export function SecurityCore() {
   return (
     <div className="security-core" aria-label="AI数据安全三维核心">
       <Canvas
-        camera={{ position: [0, 1.05, 6.2], fov: 38, near: 0.1, far: 40 }}
+        camera={{ position: [0, 0.58, 6.4], fov: 38, near: 0.1, far: 40 }}
         dpr={[1, 1.6]}
         gl={{ alpha: true, antialias: true }}
       >
