@@ -291,10 +291,10 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
 .ds-pedestal-ring-a { bottom: 14px; width: 62px; height: 14px; animation: dsRingSpin 6s linear infinite; }
 .ds-pedestal-ring-b { bottom: 8px; width: 74px; height: 16px; opacity: .55; animation: dsRingSpin 9s linear infinite reverse; }
 
-.ds-core { position: relative; z-index: 2; display: grid; place-items: center; min-height: 480px; }
-.ds-core-stage { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; width: min(100%, 720px); }
-.security-core { position: relative; width: min(100%, 460px); height: min(52vh, 460px); filter: drop-shadow(0 0 22px #1575f566); }
-.security-core canvas { width: 100% !important; height: 100% !important; }
+.ds-core { position: relative; z-index: 2; display: grid; place-items: center; min-height: 480px; overflow: visible; }
+.ds-core-stage { position: relative; display: grid; grid-template-columns: auto auto auto; align-items: center; width: max-content; max-width: none; overflow: visible; }
+.security-core { position: relative; width: 640px; height: min(52vh, 460px); flex: none; overflow: visible; filter: drop-shadow(0 0 22px #1575f566); }
+.security-core canvas { width: 100% !important; height: 100% !important; overflow: visible; }
 .security-shield { position: absolute; left: 50%; top: 36%; z-index: 4; width: clamp(78px, 8.4vw, 112px); transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(0 0 14px #8adfff88) drop-shadow(0 8px 18px #00000088); animation: dsShieldFloat 4.2s ease-in-out infinite; }
 .security-shield-svg { display: block; width: 100%; height: auto; }
 
@@ -326,9 +326,9 @@ html, body { width: 100%; height: 100%; overflow: hidden; }
   .ds-side-title { writing-mode: horizontal-tb !important; letter-spacing: .12em; text-align: center; }
   .ds-feature-list { flex-direction: row; flex-wrap: wrap; justify-content: center; }
   .ds-core { min-height: 400px; }
-  .ds-core-stage { grid-template-columns: 1fr; width: 100%; }
+  .ds-core-stage { grid-template-columns: 1fr; width: 100%; max-width: 100%; }
   .ds-satellite { margin: 0; }
   .ds-satellite-left, .ds-satellite-right { justify-self: center; margin: 0; }
   .ds-chevron { display: none; }
-  .security-core { height: 380px; }
+  .security-core { width: min(720px, 100vw); height: 380px; justify-self: center; }
 }
