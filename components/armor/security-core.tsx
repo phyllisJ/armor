@@ -119,9 +119,9 @@ function RadialTicks({ count, radius, length, y }: { count: number; radius: numb
           >
             <boxGeometry args={[0.025, 0.018, index % 4 === 0 ? length * 1.65 : length]} />
             <meshBasicMaterial
-              color={index % 4 === 0 ? '#d9f7ff' : '#3aa8ff'}
+              color={index % 4 === 0 ? '#8fcfff' : '#1766ad'}
               transparent
-              opacity={index % 4 === 0 ? 0.95 : 0.58}
+              opacity={index % 4 === 0 ? 0.72 : 0.38}
               blending={THREE.AdditiveBlending}
             />
           </mesh>
@@ -150,50 +150,50 @@ function Pedestal() {
     <group position={[0, -1.5, 0]}>
       <mesh position={[0, -0.34, 0]}>
         <cylinderGeometry args={[2.28, 2.48, 0.2, 96]} />
-        <meshStandardMaterial color="#020b1b" metalness={0.92} roughness={0.24} emissive="#061d42" emissiveIntensity={0.75} />
+        <meshStandardMaterial color="#010817" metalness={0.96} roughness={0.3} emissive="#03132d" emissiveIntensity={0.45} />
       </mesh>
       <mesh position={[0, -0.19, 0]}>
         <cylinderGeometry args={[2.05, 2.28, 0.14, 96]} />
-        <meshStandardMaterial color="#06162d" metalness={0.9} roughness={0.2} emissive="#07366d" emissiveIntensity={0.62} />
+        <meshStandardMaterial color="#041127" metalness={0.94} roughness={0.27} emissive="#052147" emissiveIntensity={0.42} />
       </mesh>
       <mesh position={[0, -0.07, 0]}>
         <cylinderGeometry args={[1.72, 2.04, 0.12, 96]} />
-        <meshStandardMaterial color="#071a34" metalness={0.86} roughness={0.2} emissive="#0a3d7a" emissiveIntensity={0.7} />
+        <meshStandardMaterial color="#06162d" metalness={0.92} roughness={0.24} emissive="#082b58" emissiveIntensity={0.46} />
       </mesh>
       <mesh position={[0, 0.08, 0]}>
         <cylinderGeometry args={[1.18, 1.55, 0.18, 96]} />
-        <meshStandardMaterial color="#082447" metalness={0.8} roughness={0.18} emissive="#096fc4" emissiveIntensity={0.9} />
+        <meshStandardMaterial color="#071a35" metalness={0.9} roughness={0.2} emissive="#0b3e75" emissiveIntensity={0.55} />
       </mesh>
       <mesh position={[0, 0.2, 0]}>
         <cylinderGeometry args={[0.76, 1.02, 0.12, 96]} />
-        <meshStandardMaterial color="#0a315c" metalness={0.72} roughness={0.14} emissive="#139ee8" emissiveIntensity={1.25} />
+        <meshStandardMaterial color="#092142" metalness={0.88} roughness={0.18} emissive="#0d568f" emissiveIntensity={0.7} />
       </mesh>
 
       <mesh ref={glow} position={[0, 0.27, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.68, 64]} />
-        <meshBasicMaterial color="#38b9ff" transparent opacity={0.3} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#2389c7" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
       <group ref={clockwise}>
         <RadialTicks count={48} radius={1.48} length={0.18} y={0.05} />
         <RadialTicks count={24} radius={2.05} length={0.22} y={-0.13} />
-        <PedestalRing radius={0.82} tube={0.028} y={0.29} speed={0} color="#b8efff" opacity={0.95} />
-        <PedestalRing radius={1.12} tube={0.018} y={0.2} speed={0} color="#35baff" opacity={0.92} />
-        <PedestalRing radius={1.58} tube={0.014} y={0.07} speed={0} color="#258fff" opacity={0.75} />
+        <PedestalRing radius={0.82} tube={0.022} y={0.29} speed={0} color="#8fcfff" opacity={0.78} />
+        <PedestalRing radius={1.12} tube={0.014} y={0.2} speed={0} color="#2d8fc7" opacity={0.68} />
+        <PedestalRing radius={1.58} tube={0.011} y={0.07} speed={0} color="#1766ad" opacity={0.52} />
       </group>
       <group ref={counterClockwise}>
         <RadialTicks count={32} radius={1.78} length={0.14} y={-0.05} />
-        <PedestalRing radius={1.82} tube={0.012} y={-0.08} speed={0} color="#48c7ff" opacity={0.62} />
-        <PedestalRing radius={2.27} tube={0.009} y={-0.27} speed={0} color="#1675f5" opacity={0.8} />
-        <PedestalRing radius={2.42} tube={0.006} y={-0.39} speed={0} color="#1669df" opacity={0.42} />
+        <PedestalRing radius={1.82} tube={0.009} y={-0.08} speed={0} color="#2d8fc7" opacity={0.44} />
+        <PedestalRing radius={2.27} tube={0.007} y={-0.27} speed={0} color="#1766ad" opacity={0.58} />
+        <PedestalRing radius={2.42} tube={0.005} y={-0.39} speed={0} color="#1766ad" opacity={0.26} />
       </group>
 
       <mesh position={[0, 1.02, 0]}>
         <cylinderGeometry args={[0.1, 0.65, 2.05, 48, 1, true]} />
-        <meshBasicMaterial color="#42c5ff" transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#2d8fc7" transparent opacity={0.065} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <pointLight position={[0, 0.45, 0]} intensity={3.2} distance={6} color="#35baff" />
-      <pointLight position={[0, 1.7, 0.6]} intensity={1.5} distance={5} color="#b8efff" />
+      <pointLight position={[0, 0.45, 0]} intensity={2.1} distance={6} color="#2d8fc7" />
+      <pointLight position={[0, 1.7, 0.6]} intensity={0.85} distance={5} color="#8fcfff" />
     </group>
   )
 }
@@ -222,7 +222,7 @@ function FloatingDust() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial color="#6ad8ff" size={0.03} transparent opacity={0.55} depthWrite={false} blending={THREE.AdditiveBlending} />
+      <pointsMaterial color="#8fcfff" size={0.025} transparent opacity={0.34} depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
   )
 }
@@ -230,8 +230,8 @@ function FloatingDust() {
 function SecurityScene() {
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[3, 5, 2]} intensity={0.8} color="#c8e8ff" />
+      <ambientLight intensity={0.18} />
+      <directionalLight position={[3, 5, 2]} intensity={0.48} color="#8fcfff" />
       <WireSphere />
       <Pedestal />
       <FloatingDust />
