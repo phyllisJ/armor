@@ -148,10 +148,6 @@ function Pedestal() {
 
   return (
     <group position={[0, -1.5, 0]}>
-      <mesh position={[0, -0.34, 0]}>
-        <cylinderGeometry args={[2.28, 2.48, 0.2, 96]} />
-        <meshStandardMaterial color="#010817" metalness={0.96} roughness={0.3} emissive="#03132d" emissiveIntensity={0.45} />
-      </mesh>
       <mesh position={[0, -0.19, 0]}>
         <cylinderGeometry args={[2.05, 2.28, 0.14, 96]} />
         <meshStandardMaterial color="#041127" metalness={0.94} roughness={0.27} emissive="#052147" emissiveIntensity={0.42} />
