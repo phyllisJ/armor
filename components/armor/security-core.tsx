@@ -89,6 +89,7 @@ function Tier({
   surfaceOpacity,
   rimColor,
   rimOpacity,
+  glass = false,
 }: {
   topRadius: number
   bottomRadius: number
@@ -101,28 +102,69 @@ function Tier({
   surfaceOpacity: number
   rimColor: string
   rimOpacity: number
+  glass?: boolean
 }) {
+  // 0.5px 描边：场景中约 105px/单位，取 0.005 单位半宽
+  const rimInner = glass ? topRadius - 0.005 : topRadius - 0.055
+  const rimOuter = glass ? topRadius + 0.005 : topRadius + 0.01
+
   return (
     <group>
       {/* 侧壁 */}
       <mesh position={[0, top - height / 2, 0]}>
         <cylinderGeometry args={[topRadius, bottomRadius, height, 128]} />
-        <meshStandardMaterial
-          color={bodyColor}
-          metalness={0.86}
-          roughness={0.24}
-          emissive={emissive}
-          emissiveIntensity={emissiveIntensity}
-        />
+        {glass ? (
+          <meshPhysicalMaterial
+            color={bodyColor}
+            transparent
+            opacity={0.18}
+            transmission={0.92}
+            thickness={0.35}
+            ior={1.3}
+            roughness={0.08}
+            metalness={0}
+            clearcoat={1}
+            clearcoatRoughness={0.06}
+            emissive={emissive}
+            emissiveIntensity={emissiveIntensity * 0.35}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        ) : (
+          <meshStandardMaterial
+            color={bodyColor}
+            metalness={0.86}
+            roughness={0.24}
+            emissive={emissive}
+            emissiveIntensity={emissiveIntensity}
+          />
+        )}
       </mesh>
-      {/* 顶面发光盘 */}
+      {/* 顶面：玻璃层使用极淡透光面，实心层保留发光盘 */}
       <mesh position={[0, top + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[topRadius, 128]} />
-        <meshBasicMaterial color={surfaceColor} transparent opacity={surfaceOpacity} blending={THREE.AdditiveBlending} depthWrite={false} />
+        {glass ? (
+          <meshPhysicalMaterial
+            color={surfaceColor}
+            transparent
+            opacity={surfaceOpacity * 0.28}
+            transmission={0.9}
+            thickness={0.15}
+            ior={1.25}
+            roughness={0.06}
+            metalness={0}
+            clearcoat={1}
+            clearcoatRoughness={0.04}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        ) : (
+          <meshBasicMaterial color={surfaceColor} transparent opacity={surfaceOpacity} blending={THREE.AdditiveBlending} depthWrite={false} />
+        )}
       </mesh>
       {/* 顶面描边光环 */}
       <mesh position={[0, top + 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[topRadius - 0.055, topRadius + 0.01, 160]} />
+        <ringGeometry args={[rimInner, rimOuter, 200]} />
         <meshBasicMaterial color={rimColor} transparent opacity={rimOpacity} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
     </group>
@@ -235,7 +277,8 @@ function Pedestal() {
         surfaceColor="#2472b8"
         surfaceOpacity={0.36}
         rimColor="#77caff"
-        rimOpacity={0.65}
+        rimOpacity={0.8}
+        glass
       />
       <Tier
         topRadius={1.16}
@@ -248,7 +291,8 @@ function Pedestal() {
         surfaceColor="#2f8fd8"
         surfaceOpacity={0.42}
         rimColor="#9adcff"
-        rimOpacity={0.78}
+        rimOpacity={0.9}
+        glass
       />
       <Tier
         topRadius={0.78}
@@ -261,7 +305,8 @@ function Pedestal() {
         surfaceColor="#5cbcf0"
         surfaceOpacity={0.5}
         rimColor="#cdeeff"
-        rimOpacity={0.9}
+        rimOpacity={1}
+        glass
       />
 
       {/* 中心高亮能量核心 */}
