@@ -1,164 +1,130 @@
 'use client'
 
+import { useState, type CSSProperties } from 'react'
 import { SecurityCore } from '@/components/armor/security-core'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-type Feature = { id: string; title: string; icon: 'audit' | 'assess' | 'privacy' | 'detect' | 'harden' }
+type Feature = {
+  id: string
+  title: string
+}
 
 const leftFeatures: Feature[] = [
-  { id: 'l1', title: '个人信息保护合规审计', icon: 'audit' },
-  { id: 'l2', title: '个人信息保护影响评估', icon: 'assess' },
+  { id: 'audit', title: '个人信息保护\n合规审计' },
+  { id: 'assessment', title: '个人信息保护\n影响评估' },
 ]
 
 const rightFeatures: Feature[] = [
-  { id: 'r1', title: 'APP隐私合规检测', icon: 'privacy' },
-  { id: 'r2', title: '移动应用安全检测', icon: 'detect' },
-  { id: 'r3', title: '移动应用安全加固', icon: 'harden' },
+  { id: 'privacy', title: 'APP隐私合规\n检测' },
+  { id: 'detection', title: '移动应用安全\n检测' },
+  { id: 'hardening', title: '移动应用安全\n加固' },
 ]
 
-function PedestalBase() {
+/** 竖排标题沿括号弧线排布：left=`(` / right=`)` */
+function CurvedTitle({
+  text,
+  className,
+  arc = 'left',
+}: {
+  text: string
+  className?: string
+  arc?: 'left' | 'right'
+}) {
+  const chars = Array.from(text)
+  const last = Math.max(chars.length - 1, 1)
+  const amplitude = 16
+  const tilt = 6
+
   return (
-    <span className="ds-pedestal" aria-hidden="true">
-      <i className="ds-pedestal-glow" />
-      <i className="ds-pedestal-ring ds-pedestal-ring-a" />
-      <i className="ds-pedestal-ring ds-pedestal-ring-b" />
-      <i className="ds-pedestal-disk" />
-    </span>
+    <h3 className={`ds-side-title ds-side-title-arc ds-side-title-arc-${arc} ${className ?? ''}`} aria-label={text}>
+      {chars.map((ch, index) => {
+        const t = index / last
+        const bulge = Math.sin(Math.PI * t)
+        const x = (arc === 'left' ? -1 : 1) * bulge * amplitude
+        const rot = Math.cos(Math.PI * t) * (arc === 'left' ? tilt : -tilt)
+        return (
+          <span
+            key={`${ch}-${index}`}
+            style={
+              {
+                '--char-x': `${x.toFixed(1)}px`,
+                '--char-rot': `${rot.toFixed(2)}deg`,
+              } as CSSProperties
+            }
+          >
+            {ch}
+          </span>
+        )
+      })}
+    </h3>
   )
 }
 
-function FeatureIcon({ type }: { type: Feature['icon'] }) {
-  const common = { viewBox: '0 0 64 64', className: 'ds-feature-svg', 'aria-hidden': true as const }
-  if (type === 'audit') {
-    return (
-      <svg {...common}>
-        <rect x="10" y="12" width="32" height="40" rx="4" fill="#1a4a78" stroke="#5ec8ff" strokeWidth="2" />
-        <path d="M16 22h20M16 30h16M16 38h18" stroke="#8adfff" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="42" cy="40" r="12" fill="#0d2a48" stroke="#5ec8ff" strokeWidth="2.5" />
-        <circle cx="42" cy="40" r="5" fill="none" stroke="#b8f0ff" strokeWidth="2" />
-        <path d="M50 48l6 6" stroke="#b8f0ff" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
-    )
-  }
-  if (type === 'assess') {
-    return (
-      <svg {...common}>
-        <rect x="12" y="14" width="40" height="36" rx="5" fill="#1a4a78" stroke="#5ec8ff" strokeWidth="2" />
-        <path d="M32 20l12 6v8c0 8-5.5 14-12 16-6.5-2-12-8-12-16v-8z" fill="#d8ecf8" stroke="#8adfff" strokeWidth="1.5" />
-        <path d="M26 34l4 4 8-9" fill="none" stroke="#0a1a2e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  }
-  if (type === 'privacy') {
-    return (
-      <svg {...common}>
-        <rect x="18" y="8" width="28" height="48" rx="5" fill="#1a4a78" stroke="#5ec8ff" strokeWidth="2" />
-        <rect x="24" y="14" width="16" height="28" rx="2" fill="#0d2a48" />
-        <circle cx="32" cy="48" r="2.5" fill="#8adfff" />
-        <path d="M40 28l10-4v8c0 6-4 10-10 12" fill="none" stroke="#b8f0ff" strokeWidth="2.2" />
-        <path d="M42 32l3 3 6-7" fill="none" stroke="#5ec8ff" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    )
-  }
-  if (type === 'detect') {
-    return (
-      <svg {...common}>
-        <rect x="18" y="8" width="28" height="48" rx="5" fill="#1a4a78" stroke="#5ec8ff" strokeWidth="2" />
-        <rect x="24" y="14" width="16" height="28" rx="2" fill="#0d2a48" />
-        <circle cx="32" cy="48" r="2.5" fill="#8adfff" />
-        <rect x="38" y="26" width="16" height="14" rx="2" fill="#0d2a48" stroke="#5ec8ff" strokeWidth="1.8" />
-        <path d="M42 33h8M46 29v8" stroke="#b8f0ff" strokeWidth="1.8" strokeLinecap="round" />
-      </svg>
-    )
-  }
+function TechnologyNode({ feature, index, active, onSelect }: {
+  feature: Feature
+  index: number
+  active: boolean
+  onSelect: () => void
+}) {
   return (
-    <svg {...common}>
-      <rect x="18" y="8" width="28" height="48" rx="5" fill="#1a4a78" stroke="#5ec8ff" strokeWidth="2" />
-      <rect x="24" y="14" width="16" height="28" rx="2" fill="#0d2a48" />
-      <circle cx="32" cy="48" r="2.5" fill="#8adfff" />
-      <path d="M44 22v6h10l-4 14H40l2-8h-6z" fill="#d8ecf8" stroke="#5ec8ff" strokeWidth="1.2" />
-    </svg>
-  )
-}
-
-function FeatureNode({ feature, index }: { feature: Feature; index: number }) {
-  return (
-    <div className="ds-feature" style={{ '--ds-i': index } as React.CSSProperties}>
-      <div className="ds-feature-visual">
-        <span className="ds-feature-icon">
-          <FeatureIcon type={feature.icon} />
-        </span>
-        <PedestalBase />
-      </div>
+    <button
+      type="button"
+      className={`ds-feature ${active ? 'is-active' : ''}`}
+      style={{ '--ds-i': index } as CSSProperties}
+      onClick={onSelect}
+      aria-pressed={active}
+    >
+      <span className="ds-feature-visual">
+        <img src="/images/safe/des_icon.png" alt="" className="ds-feature-icon-img" aria-hidden="true" />
+      </span>
       <strong>{feature.title}</strong>
-    </div>
+    </button>
   )
 }
 
-function Satellite({ label, side }: { label: string; side: 'left' | 'right' }) {
+function AiEngine({ label, side }: { label: string; side: 'left' | 'right' }) {
+  const logo = side === 'left' ? '/images/safe/ai_logo_left.png' : '/images/safe/ai_logo_right.png'
   return (
-    <div className={`ds-satellite ds-satellite-${side}`}>
-      <div className="ds-satellite-visual">
-        <span className="ds-satellite-badge" aria-hidden="true">
-          <svg viewBox="0 0 72 72" className="ds-satellite-svg">
-            <defs>
-              <linearGradient id={`satGrad-${side}`} x1="20%" y1="0%" x2="80%" y2="100%">
-                <stop offset="0%" stopColor="#f0f8ff" />
-                <stop offset="100%" stopColor="#9ec4e8" />
-              </linearGradient>
-            </defs>
-            <path d="M36 8l22 10v22c0 14-9 24-22 28-13-4-22-14-22-28V18z" fill={`url(#satGrad-${side})`} stroke="#7ec8ff" strokeWidth="2" />
-            <rect x="22" y="28" width="28" height="18" rx="3" fill="#0a1a2e" />
-            <text x="36" y="41" textAnchor="middle" fill="#7adfff" fontSize="11" fontWeight="700" fontFamily="sans-serif">
-              AI
-            </text>
-          </svg>
-        </span>
-        <PedestalBase />
-      </div>
+    <div className={`ds-engine ds-engine-${side}`}>
+      <img src={logo} alt="" className="ds-engine-logo" aria-hidden="true" />
       <strong>{label}</strong>
     </div>
   )
 }
 
 export function DataSecurityScreen({ active }: { active: boolean }) {
+  const [selected, setSelected] = useState('audit')
+
   return (
     <div className={`ds-body ${active ? 'ds-active' : ''}`}>
-      <div className="ds-orbit-ring ds-orbit-a" aria-hidden="true" />
-      <div className="ds-orbit-ring ds-orbit-b" aria-hidden="true" />
+      <img src="/images/safe/bg_left.png" alt="" className="ds-side-bg ds-side-bg-left" aria-hidden="true" />
+      <img src="/images/safe/bg_right.png" alt="" className="ds-side-bg ds-side-bg-right" aria-hidden="true" />
 
-      <aside className="ds-side ds-side-left reveal delay-2">
-        <div className="ds-rail" aria-hidden="true" />
-        <h3 className="ds-side-title">个人信息保护平台</h3>
+      <aside className="ds-side ds-side-left">
+        <CurvedTitle text="个人信息保护平台" arc="left" />
         <div className="ds-feature-list">
-          {leftFeatures.map((f, i) => (
-            <FeatureNode key={f.id} feature={f} index={i} />
+          {leftFeatures.map((feature, index) => (
+            <TechnologyNode key={feature.id} feature={feature} index={index} active={selected === feature.id} onSelect={() => setSelected(feature.id)} />
           ))}
         </div>
       </aside>
 
-      <div className="ds-core reveal delay-3">
-        <button type="button" className="ds-chevron ds-chevron-left" aria-label="上一项" tabIndex={-1}>
-          <ChevronLeft size={28} strokeWidth={1.6} />
-        </button>
-        <div className="ds-core-stage">
-          <Satellite label="AI审计大模型" side="left" />
+      <section className="ds-center" aria-label="AI 数据安全核心能力">
+        <img src="/images/safe/left_arrow.png" alt="" className="ds-chevron ds-chevron-left" aria-hidden="true" />
+        <div className="ds-center-layout">
+          <AiEngine label="AI审计大模型" side="left" />
           <SecurityCore />
-          <Satellite label="AI风险识别引擎" side="right" />
+          <AiEngine label="AI风险识别引擎" side="right" />
         </div>
-        <button type="button" className="ds-chevron ds-chevron-right" aria-label="下一项" tabIndex={-1}>
-          <ChevronRight size={28} strokeWidth={1.6} />
-        </button>
-      </div>
+        <img src="/images/safe/right_arrow.png" alt="" className="ds-chevron ds-chevron-right" aria-hidden="true" />
+      </section>
 
-      <aside className="ds-side ds-side-right reveal delay-4">
-        <div className="ds-rail" aria-hidden="true" />
+      <aside className="ds-side ds-side-right">
         <div className="ds-feature-list">
-          {rightFeatures.map((f, i) => (
-            <FeatureNode key={f.id} feature={f} index={i} />
+          {rightFeatures.map((feature, index) => (
+            <TechnologyNode key={feature.id} feature={feature} index={index + 2} active={selected === feature.id} onSelect={() => setSelected(feature.id)} />
           ))}
         </div>
-        <h3 className="ds-side-title">隐私安全检测平台</h3>
+        <CurvedTitle text="隐私安全检测平台" arc="right" />
       </aside>
     </div>
   )

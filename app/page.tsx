@@ -87,7 +87,7 @@ const leftItems = [
   { icon: Cpu, small: 'ARM架构', big: '处理器' },
   { icon: Waypoints, small: '端云协同', big: '调度算法' },
   { icon: Zap, small: '并行渲染', big: 'GPU及AI加速单元' },
-  { icon: CloudCog, small: '低延时 高并发', big: '云端服务能力' },
+{ icon: CloudCog, small: '低延时 高并发', big: '云端服务能力' },
 ]
 
 const points = [
@@ -97,7 +97,7 @@ const points = [
 ]
 
 // 首屏开场流程开关。
-const ENABLE_INTRO_SCREEN = false
+const ENABLE_INTRO_SCREEN = true
 
 export default function Home() {
   const [showEcosystem, setShowEcosystem] = useState(!ENABLE_INTRO_SCREEN)
